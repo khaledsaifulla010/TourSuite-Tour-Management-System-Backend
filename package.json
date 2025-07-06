@@ -4,6 +4,7 @@
   "description": "This is Tour Management System Backend.",
   "main": "index.js",
   "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Khaled Saifulla",
