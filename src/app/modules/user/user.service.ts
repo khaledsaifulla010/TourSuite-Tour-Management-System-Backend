@@ -18,7 +18,7 @@ const createUser = async (payload: Partial<IUser>) => {
   // password validation
   const hashedPassword = await bcryptjs.hash(
     password as string,
-    envVars.BCRYPT_SALT_ROUND
+    Number(envVars.BCRYPT_SALT_ROUND)
   );
 
   const authProvider: IAuthProvider = {
