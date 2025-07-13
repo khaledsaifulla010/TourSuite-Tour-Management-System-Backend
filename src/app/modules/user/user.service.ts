@@ -3,6 +3,7 @@ import { IAuthProvider, IUser } from "./user.interface";
 import { User } from "./user.model";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs";
+import { envVars } from "../../config/env";
 
 // CREATE A USER
 const createUser = async (payload: Partial<IUser>) => {
@@ -15,7 +16,10 @@ const createUser = async (payload: Partial<IUser>) => {
   }
 
   // password validation
-  const hashedPassword = await bcryptjs.hash(password as string, 10);
+  const hashedPassword = await bcryptjs.hash(
+    password as string,
+    envVars.BCRYPT_SALT_ROUND
+  );
 
   const authProvider: IAuthProvider = {
     provider: "credentials",

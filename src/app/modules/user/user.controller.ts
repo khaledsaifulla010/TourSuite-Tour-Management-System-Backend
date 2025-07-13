@@ -25,7 +25,7 @@ const getAllUsers = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const result = await UserServices.getAllUsers();
     sendResponse(res, {
-      statusCode: httpStatus.CREATED,
+      statusCode: httpStatus.OK,
       success: true,
       message: "All Users Retrieved Sucessfully.",
       data: result.data,
