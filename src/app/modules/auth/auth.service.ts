@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import AppError from "../../errorHelpers/AppError";
-import { IsActive, IUser } from "../user/user.interface";
+
 import httpStatus from "http-status-codes";
 import { User } from "../user/user.model";
 import bcryptjs from "bcryptjs";
-import { generateToken, verifyToken } from "../../utils/jwt";
-import { envVars } from "../../config/env";
-import { createUserTokens } from "../../utils/userTokens";
-import { JwtPayload } from "jsonwebtoken";
+import {
+  createNewAccessTokenWithRefreshToken,
+  createUserTokens,
+} from "../../utils/userTokens";
+import { IUser } from "../user/user.interface";
 
 // CREDENTIAL LOGIN //
 const credentialsLogin = async (payload: Partial<IUser>) => {
@@ -58,47 +59,11 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
   };
 };
 
-
 // GET NEW ACCESS TOKEN
 const getNewAccessToken = async (refreshToken: string) => {
-  const verifiedRefreshToken = verifyToken(
-    refreshToken,
-    envVars.JWT_REFRESH_SECRET
-  ) as JwtPayload;
-
-  const isUserExist = await User.findOne({ email: verifiedRefreshToken.email });
-
-  if (!isUserExist) {
-    throw new AppError(httpStatus.BAD_REQUEST, "User Doesn't Exist!", "");
-  }
-  if (
-    isUserExist.isActive === IsActive.BLOCKED ||
-    isUserExist.isActive === IsActive.INACTIVE
-  ) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      `User is ${isUserExist.isActive}  !`,
-      ""
-    );
-  }
-  if (isUserExist.isDeleted) {
-    throw new AppError(httpStatus.BAD_REQUEST, "User is Deleted!", "");
-  }
-
-  // JWT
-  const jwtPayload = {
-    userId: isUserExist._id,
-    email: isUserExist.email,
-    role: isUserExist.role,
-  };
-
-  const accessToken = generateToken(
-    jwtPayload,
-    envVars.JWT_ACCESS_SECRET,
-    envVars.JWT_ACCESS_EXPIRES
-  );
+  const newAccessToken = await createNewAccessTokenWithRefreshToken(refreshToken);
   return {
-    accessToken,
+    accessToken: newAccessToken,
   };
 };
 
