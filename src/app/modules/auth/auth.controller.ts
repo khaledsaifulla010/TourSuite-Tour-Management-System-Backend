@@ -7,6 +7,7 @@ import { AuthService } from "./auth.service";
 import AppError from "../../errorHelpers/AppError";
 import { setAuthCookie } from "../../utils/setCookie";
 
+// credentialsLogin
 const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     // const user = await UserServices.createUser(req.body);
@@ -24,7 +25,7 @@ const credentialsLogin = catchAsync(
     // });
 
     setAuthCookie(res, loginInfo);
-    
+
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -33,6 +34,8 @@ const credentialsLogin = catchAsync(
     });
   }
 );
+
+//getNewAccessToken
 
 const getNewAccessToken = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -55,8 +58,32 @@ const getNewAccessToken = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "User Logged in Sucessfully.",
+      message: "New Access Token Retrieved Sucessfully.",
       data: tokenInfo,
+    });
+  }
+);
+
+// logout
+
+const logout = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User Logged Out Sucessfully.",
+      data: null,
     });
   }
 );
@@ -64,4 +91,5 @@ const getNewAccessToken = catchAsync(
 export const AuthControllers = {
   credentialsLogin,
   getNewAccessToken,
+  logout,
 };
