@@ -6,6 +6,9 @@ import httpStatus from "http-status-codes";
 import { AuthService } from "./auth.service";
 import AppError from "../../errorHelpers/AppError";
 import { setAuthCookie } from "../../utils/setCookie";
+import { createUserTokens } from "../../utils/userTokens";
+import { envVars } from "../../config/env";
+import { JwtPayload } from "jsonwebtoken";
 
 // credentialsLogin
 const credentialsLogin = catchAsync(
@@ -36,7 +39,6 @@ const credentialsLogin = catchAsync(
 );
 
 //getNewAccessToken
-
 const getNewAccessToken = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies.refreshToken;
@@ -65,7 +67,6 @@ const getNewAccessToken = catchAsync(
 );
 
 // logout
-
 const logout = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     res.clearCookie("accessToken", {
@@ -89,14 +90,17 @@ const logout = catchAsync(
 );
 
 // resetPassword
-
 const resetPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const decodedToken = req.user;
     const newPassword = req.body.newPassword;
     const oldPassword = req.body.oldPassword;
 
-    await AuthService.resetPassword(oldPassword, newPassword, decodedToken);
+    await AuthService.resetPassword(
+      oldPassword,
+      newPassword,
+      decodedToken as JwtPayload
+    );
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -106,9 +110,26 @@ const resetPassword = catchAsync(
     });
   }
 );
+
+// googleCallbackController
+const googleCallbackController = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user;
+    console.log(user);
+
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, "User Not Found", "");
+    }
+
+    const tokenInfo = createUserTokens(user);
+    setAuthCookie(res, tokenInfo);
+    res.redirect(`${envVars.FRONTEND_URL}`);
+  }
+);
 export const AuthControllers = {
   credentialsLogin,
   getNewAccessToken,
   logout,
   resetPassword,
+  googleCallbackController,
 };
