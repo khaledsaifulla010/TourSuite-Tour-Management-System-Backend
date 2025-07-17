@@ -5,10 +5,12 @@ import {
   Profile,
   VerifyCallback,
 } from "passport-google-oauth20";
+import { Strategy as LocalStrategy } from "passport-local";
 import { envVars } from "./env";
 import { User } from "../modules/user/user.model";
 import { Role } from "../modules/user/user.interface";
-
+import bcryptjs from "bcryptjs";
+// Google Authentication //
 passport.use(
   new GoogleStrategy(
     {
@@ -67,3 +69,34 @@ passport.deserializeUser(async (id: string, done: any) => {
     done(error);
   }
 });
+
+// Custom Authentication //
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "email",
+      passwordField: "password",
+    },
+    async (email: string, password: string, done: VerifyCallback) => {
+      try {
+        const isUserExist = await User.findOne({ email });
+
+        if (!isUserExist) {
+          return done(null, false, { message: "User doesnot Exist!" });
+        }
+
+        const isPasswordMatch = await bcryptjs.compare(
+          password as string,
+          isUserExist.password as string
+        );
+
+        if (!isPasswordMatch) {
+          return done(null, false, { message: "Incorrect Password !" });
+        }
+        return done(null, isUserExist);
+      } catch (error) {
+        done(error);
+      }
+    }
+  )
+);
