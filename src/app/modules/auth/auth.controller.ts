@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
@@ -9,32 +10,34 @@ import { setAuthCookie } from "../../utils/setCookie";
 import { createUserTokens } from "../../utils/userTokens";
 import { envVars } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
+import passport from "passport";
 
 // credentialsLogin
 const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    // const user = await UserServices.createUser(req.body);
+    passport.authenticate("local", async (error: any, user: any, info: any) => {
+      if (error) {
+        return next(new AppError(401, error, ""));
+      }
+      if (!user) {
+        return next(new AppError(401, info.message, ""));
+      }
 
-    const loginInfo = await AuthService.credentialsLogin(req.body);
+      const userTokens = await createUserTokens(user);
+      const { password: pass, ...rest } = user.toObject();
 
-    // after done getNewAccessToken's works
-    // res.cookie("accessToken", loginInfo.accessToken, {
-    //   httpOnly: true,
-    //   secure: false,
-    // });
-    // res.cookie("refreshToken", loginInfo.refreshToken, {
-    //   httpOnly: true,
-    //   secure: false,
-    // });
-
-    setAuthCookie(res, loginInfo);
-
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "User Logged in Sucessfully.",
-      data: loginInfo,
-    });
+      setAuthCookie(res, userTokens);
+      sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "User Logged in Sucessfully.",
+        data: {
+          accessToken: userTokens.accessToken,
+          refresToken: userTokens.refreshToken,
+          user: rest,
+        },
+      });
+    })(req, res, next);
   }
 );
 
@@ -50,11 +53,6 @@ const getNewAccessToken = catchAsync(
       );
     }
     const tokenInfo = await AuthService.getNewAccessToken(refreshToken);
-
-    // res.cookie("accessToken", tokenInfo.accessToken, {
-    //   httpOnly: true,
-    //   secure: false,
-    // });
     setAuthCookie(res, tokenInfo);
 
     sendResponse(res, {
@@ -120,7 +118,6 @@ const googleCallbackController = catchAsync(
       redirectTo = redirectTo.slice(1);
     }
     const user = req.user;
-    console.log(user);
 
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, "User Not Found", "");

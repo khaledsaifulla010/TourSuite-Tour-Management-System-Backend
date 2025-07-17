@@ -49,7 +49,6 @@ passport.use(
 
         return done(null, user);
       } catch (error) {
-        console.log("Google Strategy Error!", error);
         return done(error);
       }
     }
@@ -65,7 +64,6 @@ passport.deserializeUser(async (id: string, done: any) => {
     const user = await User.findById(id);
     done(null, user);
   } catch (error) {
-    console.log(error);
     done(error);
   }
 });
@@ -77,12 +75,22 @@ passport.use(
       usernameField: "email",
       passwordField: "password",
     },
-    async (email: string, password: string, done: VerifyCallback) => {
+    async (email: string, password: string, done) => {
       try {
         const isUserExist = await User.findOne({ email });
 
         if (!isUserExist) {
-          return done(null, false, { message: "User doesnot Exist!" });
+          return done("User doesnot Exist!");
+        }
+
+        const isGoogleAuthenticated = isUserExist.auths.some(
+          (providerObjects) => providerObjects.provider === "google"
+        );
+
+        if (isGoogleAuthenticated && !isUserExist.password) {
+          return done(
+            "You have authenticated through Google. If you want to login with credentials,then at first login with gooogle and set a password for your gmail and then you can login with email & password!"
+          );
         }
 
         const isPasswordMatch = await bcryptjs.compare(

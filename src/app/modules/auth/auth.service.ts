@@ -4,62 +4,58 @@ import AppError from "../../errorHelpers/AppError";
 import httpStatus from "http-status-codes";
 import { User } from "../user/user.model";
 import bcryptjs from "bcryptjs";
-import {
-  createNewAccessTokenWithRefreshToken,
-  createUserTokens,
-} from "../../utils/userTokens";
-import { IUser } from "../user/user.interface";
+import { createNewAccessTokenWithRefreshToken } from "../../utils/userTokens";
 import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
 
 // CREDENTIAL LOGIN //
-const credentialsLogin = async (payload: Partial<IUser>) => {
-  const { email, password } = payload;
-  const isUserExist = await User.findOne({ email });
+// const credentialsLogin = async (payload: Partial<IUser>) => {
+//   const { email, password } = payload;
+//   const isUserExist = await User.findOne({ email });
 
-  if (!isUserExist) {
-    throw new AppError(httpStatus.BAD_REQUEST, "User Doesn't Exist!", "");
-  }
+//   if (!isUserExist) {
+//     throw new AppError(httpStatus.BAD_REQUEST, "User Doesn't Exist!", "");
+//   }
 
-  const isPasswordMatch = await bcryptjs.compare(
-    password as string,
-    isUserExist.password as string
-  );
+//   const isPasswordMatch = await bcryptjs.compare(
+//     password as string,
+//     isUserExist.password as string
+//   );
 
-  if (!isPasswordMatch) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Incorrect Password !", "");
-  }
+//   if (!isPasswordMatch) {
+//     throw new AppError(httpStatus.BAD_REQUEST, "Incorrect Password !", "");
+//   }
 
-  // // JWT
-  // const jwtPayload = {
-  //   userId: isUserExist._id,
-  //   email: isUserExist.email,
-  //   role: isUserExist.role,
-  // };
+//   // // JWT
+//   // const jwtPayload = {
+//   //   userId: isUserExist._id,
+//   //   email: isUserExist.email,
+//   //   role: isUserExist.role,
+//   // };
 
-  // const accessToken = generateToken(
-  //   jwtPayload,
-  //   envVars.JWT_ACCESS_SECRET,
-  //   envVars.JWT_ACCESS_EXPIRES
-  // );
+//   // const accessToken = generateToken(
+//   //   jwtPayload,
+//   //   envVars.JWT_ACCESS_SECRET,
+//   //   envVars.JWT_ACCESS_EXPIRES
+//   // );
 
-  // const refreshToken = generateToken(
-  //   jwtPayload,
-  //   envVars.JWT_REFRESH_SECRET,
-  //   envVars.JWT_REFRESH_EXPIRES
-  // );
+//   // const refreshToken = generateToken(
+//   //   jwtPayload,
+//   //   envVars.JWT_REFRESH_SECRET,
+//   //   envVars.JWT_REFRESH_EXPIRES
+//   // );
 
-  const userTokens = createUserTokens(isUserExist);
+//   const userTokens = createUserTokens(isUserExist);
 
-  //Dont show the password in frontend & backend
-  const { password: pass, ...rest } = isUserExist.toObject();
+//   //Dont show the password in frontend & backend
+//   const { password: pass, ...rest } = isUserExist.toObject();
 
-  return {
-    accessToken: userTokens.accessToken,
-    refreshToken: userTokens.refreshToken,
-    user: rest,
-  };
-};
+//   return {
+//     accessToken: userTokens.accessToken,
+//     refreshToken: userTokens.refreshToken,
+//     user: rest,
+//   };
+// };
 
 // GET NEW ACCESS TOKEN
 const getNewAccessToken = async (refreshToken: string) => {
@@ -100,7 +96,7 @@ const resetPassword = async (
 };
 
 export const AuthService = {
-  credentialsLogin,
+  // credentialsLogin,
   getNewAccessToken,
   resetPassword,
 };
