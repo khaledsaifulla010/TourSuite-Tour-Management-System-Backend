@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { envVars } from "../config/env";
 import { IAuthProvider, IUser, Role } from "../modules/user/user.interface";
 import { User } from "../modules/user/user.model";
@@ -8,10 +9,8 @@ export const seedSuperAdmin = async () => {
       email: envVars.SUPER_ADMIN_EMAIL,
     });
     if (isSuperAdminExist) {
-      console.log("Already Exist");
       return;
     }
-    console.log("Super Admin Already Exist!");
 
     const hashedPassword = await bcryptjs.hash(
       envVars.SUPER_ADMIN_PASSWORD,
