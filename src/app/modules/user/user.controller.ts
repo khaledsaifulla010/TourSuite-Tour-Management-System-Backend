@@ -5,6 +5,7 @@ import httpStatus from "http-status-codes";
 import { UserServices } from "./user.service";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
+import { JwtPayload } from "jsonwebtoken";
 
 // CREATE A USER CONTROLLER
 const createUser = catchAsync(
@@ -18,14 +19,32 @@ const createUser = catchAsync(
     });
   }
 );
-
+// UPDATE A USER //
+const updateUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params.id;
+    const verifiedToken = req.user;
+    const payload = req.body;
+    const user = await UserServices.updateUser(
+      userId,
+      payload,
+      verifiedToken as JwtPayload
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: "User Updated Sucessfully.",
+      data: user,
+    });
+  }
+);
 // GET ALL USER CONTROLLER //
 
 const getAllUsers = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const result = await UserServices.getAllUsers();
     sendResponse(res, {
-      statusCode: httpStatus.CREATED,
+      statusCode: httpStatus.OK,
       success: true,
       message: "All Users Retrieved Sucessfully.",
       data: result.data,
@@ -36,5 +55,6 @@ const getAllUsers = catchAsync(
 
 export const UserControllers = {
   createUser,
+  updateUser,
   getAllUsers,
 };
