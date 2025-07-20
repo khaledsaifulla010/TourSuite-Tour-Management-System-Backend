@@ -1,3 +1,4 @@
+import { tourSearchableFields } from "./tour.constant";
 import { ITour, ITourType } from "./tour.interface";
 import { Tour, TourType } from "./tour.model";
 
@@ -23,8 +24,21 @@ const createTour = async (payload: ITour) => {
 };
 
 const getAllTours = async (query: Record<string, string>) => {
+  // Filter Feature
   const filter = query;
-  const tours = await Tour.find(filter);
+
+  // Searching Feature
+  const searchTerm = query.searchTerm || "";
+  delete filter["searchTerm"];
+  const searchQuery = {
+    $or: tourSearchableFields.map((field) => ({
+      [field]: { $regex: searchTerm, $options: "i" },
+    })),
+  };
+
+  // Filter + Searching Feature
+  const tours = await Tour.find(searchQuery).find(filter);
+
   const totalTours = await Tour.countDocuments();
   return {
     data: tours,
