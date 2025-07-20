@@ -31,7 +31,7 @@ const getAllTours = async (query: Record<string, string>) => {
   // Sorting Feature
   const sort = query.sort || "-createdAt";
   // Field Filtering Feature
-  const fields = query.fields.split(",").join(" ") || "";
+  const fields = query.fields?.split(",").join(" ") || "";
   // Searching Feature
   const searchTerm = query.searchTerm || "";
   const searchQuery = {
@@ -39,6 +39,13 @@ const getAllTours = async (query: Record<string, string>) => {
       [field]: { $regex: searchTerm, $options: "i" },
     })),
   };
+
+  // Pagination Feature
+  // For Pagination skip & limit formula
+  // skip = page-1*limit
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 5;
+  const skip = (page - 1) * limit;
 
   // Dynamically delete excluded fields from filter
   for (const field of excludeFields) {
@@ -49,7 +56,9 @@ const getAllTours = async (query: Record<string, string>) => {
   const tours = await Tour.find(searchQuery)
     .find(filter)
     .sort(sort)
-    .select(fields);
+    .select(fields)
+    .skip(skip)
+    .limit(limit);
 
   const totalTours = await Tour.countDocuments();
   return {
