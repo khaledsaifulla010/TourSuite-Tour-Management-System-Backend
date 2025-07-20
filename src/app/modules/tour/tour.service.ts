@@ -43,7 +43,6 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
   if (payload.title) {
     const baseSlug = payload.title.toLowerCase().split(" ").join("-");
     let slug = `${baseSlug}-division`;
-
     let counter = 0;
     while (await Tour.exists({ slug })) {
       slug = `${slug}-${counter++}`;

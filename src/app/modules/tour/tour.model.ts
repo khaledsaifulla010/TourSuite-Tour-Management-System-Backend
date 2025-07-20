@@ -43,4 +43,39 @@ const tourSchema = new Schema<ITour>(
     timestamps: true,
   }
 );
+
+// Tour Slug Create
+tourSchema.pre("save", async function (next) {
+  if (this.isModified("title")) {
+    const baseSlug = this.title.toLowerCase().split(" ").join("-");
+    let slug = `${baseSlug}`;
+
+    let counter = 0;
+    while (await Tour.exists({ slug })) {
+      slug = `${slug}-${counter++}`;
+    }
+
+    this.slug = slug;
+  }
+  next();
+});
+
+// Tour Slug Update
+tourSchema.pre("findOneAndUpdate", async function (next) {
+  const tour = this.getUpdate() as Partial<ITour>;
+  if (tour.title) {
+    const baseSlug = tour.title.toLowerCase().split(" ").join("-");
+    let slug = `${baseSlug}`;
+
+    let counter = 0;
+    while (await Tour.exists({ slug })) {
+      slug = `${slug}-${counter++}`;
+    }
+
+    tour.slug = slug;
+  }
+  this.setUpdate(tour);
+  next();
+});
+
 export const Tour = model<ITour>("Tour", tourSchema);
