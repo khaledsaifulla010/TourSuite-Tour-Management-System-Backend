@@ -1,4 +1,3 @@
- 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from "express";
@@ -9,13 +8,26 @@ import { handleCastError } from "../helpers/handleCastError";
 import { handleMongooseValidationError } from "../helpers/handleMongooseValidationError";
 import { handleZodValidationError } from "../helpers/handleZodValidationError";
 import { TErrorSources } from "../interfaces/error.type";
+import { deleteImageFromCLoudinary } from "../config/cloudinary.config";
 
-export const globalErrorHandler = (
+export const globalErrorHandler = async (
   error: any,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  if (req.file) {
+    await deleteImageFromCLoudinary(req.file.path);
+  }
+
+  if (req.files && Array.isArray(req.files) && req.files.length) {
+    const imageUrls = (req.files as Express.Multer.File[]).map(
+      (file) => file.path
+    );
+
+    await Promise.all(imageUrls.map((url) => deleteImageFromCLoudinary(url)));
+  }
+
   let statusCode = 500;
   let message = "Something Went Wrong!";
   let errorSources: TErrorSources[] = [];
