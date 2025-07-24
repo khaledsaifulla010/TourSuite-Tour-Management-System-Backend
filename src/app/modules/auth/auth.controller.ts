@@ -141,21 +141,22 @@ const setPassword = catchAsync(
   }
 );
 
+// forgotPassword
 
-// const forgotPassword = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const { email } = req.body;
+const forgotPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body;
 
-//     await AuthService.forgotPassword(email);
+    await AuthService.forgotPassword(email);
 
-//     sendResponse(res, {
-//       success: true,
-//       statusCode: httpStatus.OK,
-//       message: "Email Sent Successfully",
-//       data: null,
-//     });
-//   }
-// );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Email Sent Successfully",
+      data: null,
+    });
+  }
+);
 
 // googleCallbackController
 const googleCallbackController = catchAsync(
@@ -184,4 +185,5 @@ export const AuthControllers = {
   resetPassword,
   googleCallbackController,
   setPassword,
+  forgotPassword,
 };

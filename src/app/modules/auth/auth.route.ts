@@ -26,6 +26,8 @@ router.post(
   AuthControllers.setPassword
 );
 
+router.post("/forgot-password", AuthControllers.forgotPassword);
+
 // GOOGLE AUTHENTICATION //
 router.get(
   "/google",
