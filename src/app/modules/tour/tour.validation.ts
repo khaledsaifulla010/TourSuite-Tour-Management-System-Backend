@@ -15,6 +15,8 @@ export const createTourZodSchema = z.object({
   maxGuests: z.number(),
   minAge: z.number(),
   division: z.string(),
+  departureLocation: z.string().optional(),
+  arrivalLocation: z.string().optional(),
 });
 
 export const updateTourZodSchema = z.object({
@@ -31,6 +33,9 @@ export const updateTourZodSchema = z.object({
   tourPlan: z.array(z.string()).optional(),
   maxGuests: z.number().optional(),
   minAge: z.number().optional(),
+  departureLocation: z.string().optional(),
+  arrivalLocation: z.string().optional(),
+  deleteImages: z.array(z.string()).optional(),
 });
 
 export const createTourTypeZodSchema = z.object({

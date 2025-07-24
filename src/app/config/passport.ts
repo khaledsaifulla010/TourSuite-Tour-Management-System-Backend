@@ -8,7 +8,7 @@ import {
 import { Strategy as LocalStrategy } from "passport-local";
 import { envVars } from "./env";
 import { User } from "../modules/user/user.model";
-import { Role } from "../modules/user/user.interface";
+import { IsActive, Role } from "../modules/user/user.interface";
 import bcryptjs from "bcryptjs";
 // Google Authentication //
 passport.use(
@@ -81,6 +81,20 @@ passport.use(
 
         if (!isUserExist) {
           return done("User doesnot Exist!");
+        }
+
+        if (!isUserExist.isVerified) {
+          return done("User is not verified");
+        }
+
+        if (
+          isUserExist.isActive === IsActive.BLOCKED ||
+          isUserExist.isActive === IsActive.INACTIVE
+        ) {
+          return done(`User is ${isUserExist.isActive}`);
+        }
+        if (isUserExist.isDeleted) {
+          return done("User is deleted");
         }
 
         const isGoogleAuthenticated = isUserExist.auths.some(
