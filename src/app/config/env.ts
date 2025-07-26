@@ -29,6 +29,7 @@ interface EnvConfig {
     SSL_SUCCESS_FRONTEND_URL: string;
     SSL_FAIL_FRONTEND_URL: string;
     SSL_CANCEL_FRONTEND_URL: string;
+    SSL_IPN_URL: string;
   };
   CLOUDINARY: {
     CLOUDINARY_CLOUD_NAME: string;
@@ -42,6 +43,10 @@ interface EnvConfig {
     SMTP_PASSWORD: string;
     SMTP_FROM: string;
   };
+  REDIS_USERNAME: string;
+  REDIS_PASSWORD: string;
+  REDIS_HOST: string;
+  REDIS_PORT: string;
 }
 const loadEnvVariables = (): EnvConfig => {
   const requiredEnvVariables: string[] = [
@@ -70,6 +75,7 @@ const loadEnvVariables = (): EnvConfig => {
     "SSL_SUCCESS_FRONTEND_URL",
     "SSL_FAIL_FRONTEND_URL",
     "SSL_CANCEL_FRONTEND_URL",
+    "SSL_IPN_URL",
     "CLOUDINARY_CLOUD_NAME",
     "CLOUDINARY_API_KEY",
     "CLOUDINARY_API_SECRET",
@@ -78,6 +84,10 @@ const loadEnvVariables = (): EnvConfig => {
     "SMTP_USER",
     "SMTP_PASSWORD",
     "SMTP_FROM",
+    "REDIS_USERNAME",
+    "REDIS_PASSWORD",
+    "REDIS_HOST",
+    "REDIS_PORT",
   ];
   requiredEnvVariables.forEach((key) => {
     if (!process.env[key]) {
@@ -112,6 +122,7 @@ const loadEnvVariables = (): EnvConfig => {
       SSL_SUCCESS_FRONTEND_URL: process.env.SSL_SUCCESS_FRONTEND_URL as string,
       SSL_FAIL_FRONTEND_URL: process.env.SSL_FAIL_FRONTEND_URL as string,
       SSL_CANCEL_FRONTEND_URL: process.env.SSL_CANCEL_FRONTEND_URL as string,
+      SSL_IPN_URL: process.env.SSL_IPN_URL as string,
     },
     CLOUDINARY: {
       CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
@@ -125,6 +136,11 @@ const loadEnvVariables = (): EnvConfig => {
       SMTP_PASSWORD: process.env.SMTP_PASSWORD as string,
       SMTP_FROM: process.env.SMTP_FROM as string,
     },
+
+    REDIS_USERNAME: process.env.REDIS_USERNAME as string,
+    REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
+    REDIS_HOST: process.env.REDIS_HOST as string,
+    REDIS_PORT: process.env.REDIS_PORT as string,
   };
 };
 
