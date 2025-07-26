@@ -20,7 +20,7 @@ router.get(
 router.get("/me", checkAuth(...Object.values(Role)), UserControllers.getMe);
 router.get(
   "/:id",
-  checkAuth(...Object.values(Role)),
+  checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
   UserControllers.getSingleUser
 );
 router.patch(
